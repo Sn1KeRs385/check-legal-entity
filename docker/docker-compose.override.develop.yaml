@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  nginx:
+    container_name: "${COMPOSE_PROJECT_NAME}-nginx"
+    image: nginx:1.27-alpine
+    ports:
+      - "${HOST_PORT_NGINX}:80"
+    volumes:
+      - ./../:/var/www/html:cached
+      - ./logs/nginx:/var/log/nginx:delegated
+      - ./config/nginx/develop/conf.d:/etc/nginx/conf.d:delegated
+    restart: always
+
+  php:
+    volumes:
+      - ./config/php/develop/ini:/usr/local/etc/php/custom.d:cached

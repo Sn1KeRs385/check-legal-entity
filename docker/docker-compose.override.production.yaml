@@ -1,0 +1,8 @@
+version: '3.9'
+
+services:
+  php:
+    volumes:
+      - ./config/php/production/ini:/usr/local/etc/php/custom.d:cached
+    ports:
+      - "${HOST_PORT_PHP}:9000"
