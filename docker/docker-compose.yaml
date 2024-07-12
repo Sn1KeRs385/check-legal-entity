@@ -17,7 +17,7 @@ services:
         volumes:
             - mysql-data:/var/lib/mysql
         ports:
-            - "${HOST_PORT_MYSQL}:5432"
+            - "${HOST_PORT_MYSQL}:3306"
         environment:
             - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
             - MYSQL_DATABASE=${MYSQL_DATABASE}

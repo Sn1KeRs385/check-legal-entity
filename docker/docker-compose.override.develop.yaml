@@ -12,6 +12,19 @@ services:
       - ./config/nginx/develop/conf.d:/etc/nginx/conf.d:delegated
     restart: always
 
+  js-dev:
+    container_name: "${COMPOSE_PROJECT_NAME}-js-dev"
+    build:
+      context: ./config/php
+      target: base
+    command: 'npm run dev'
+    ports:
+      - "${HOST_PORT_JS_DEV}:5173"
+    working_dir: /var/www/html
+    volumes:
+      - ./../:/var/www/html:cached
+    restart: always
+
   php:
     volumes:
       - ./config/php/develop/ini:/usr/local/etc/php/custom.d:cached
