@@ -6,12 +6,17 @@ import PhysicalPersonInterface from "@/types/physical-person.interface";
 import PhysicalPersonFormComponent from "@/components/PhysicalPerson/FormComponent.vue";
 import ApiRoutes from "@/constants/api-routes";
 import OrganizationTypeEnum from "@/enums/organization-type.enum";
-import TableOrganiationsComponent from "@/components/PhysicalPerson/TableOrganiationsComponent.vue";
+import TableOrganizationsComponent from "@/components/PhysicalPerson/TableOrganizationsComponent.vue";
+
+interface PhysicalPersonWithActionsLoadedInterface extends PhysicalPersonInterface {
+    isDeleting: boolean
+}
 
 const toggleModalButton = ref<HTMLButtonElement>()
 const isLoading = ref(false)
+const editId = ref<number | undefined>()
 
-const data = ref<PaginatedInterface<PhysicalPersonInterface>>({
+const data = ref<PaginatedInterface<PhysicalPersonWithActionsLoadedInterface>>({
     items: [],
     meta: {
         page: 1,
@@ -46,7 +51,7 @@ const loadPage = (page = 1, perPage: number | undefined = 25) => {
             data.value.items.splice(
                 0,
                 data.value.items.length,
-                ...response.data.items
+                ...(response.data.items).map((item) => ({...item, isDeleting: false}))
             )
         })
         .finally(() => {
@@ -54,9 +59,35 @@ const loadPage = (page = 1, perPage: number | undefined = 25) => {
         })
 }
 
-const closePhysicalPersonModal = () => {
+const onClickEditButton = (physicalPerson: PhysicalPersonInterface) => {
+    editId.value = physicalPerson.id
     toggleModalButton.value?.click()
-    loadPage(1)
+}
+
+const onClickDeleteButton = (physicalPerson: PhysicalPersonWithActionsLoadedInterface) => {
+    physicalPerson.isDeleting = true
+
+    window.axios
+        .delete<PhysicalPersonInterface>(ApiRoutes.physicalPersons.byId.replace('{id}', physicalPerson.id.toString()))
+        .then(() => {
+            loadPage(1)
+        })
+        .finally(() => {
+            physicalPerson.isDeleting = false
+        })
+}
+
+const closePhysicalPersonModal = (physicalPerson: PhysicalPersonInterface) => {
+    toggleModalButton.value?.click()
+    if (editId.value) {
+        const searchRow = data.value.items.find((item) => item.id === physicalPerson.id)
+        if (searchRow) {
+            Object.assign(searchRow, physicalPerson)
+        }
+    } else {
+        loadPage(1)
+    }
+    editId.value = undefined
 }
 </script>
 
@@ -72,7 +103,7 @@ const closePhysicalPersonModal = () => {
             <div v-if="isLoading" class="d-flex flex-row align-items-center column-gap-2">
                 <div>Загрузка...</div>
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">Загрузка...</span>
                 </div>
             </div>
         </div>
@@ -87,6 +118,7 @@ const closePhysicalPersonModal = () => {
                 <th scope="col">Руководитель</th>
                 <th scope="col">Учредитель</th>
                 <th scope="col">ИП</th>
+                <th scope="col">Действия</th>
             </tr>
             </thead>
             <tbody>
@@ -97,13 +129,25 @@ const closePhysicalPersonModal = () => {
                 <td>{{ row.firstName }}</td>
                 <td>{{ row.lastName || '-' }}</td>
                 <td>
-                    <table-organiations-component :person="row" :type="OrganizationTypeEnum.SUPERVISOR"/>
+                    <table-organizations-component :person="row" :type="OrganizationTypeEnum.SUPERVISOR"/>
                 </td>
                 <td>
-                    <table-organiations-component :person="row" :type="OrganizationTypeEnum.FOUNDER"/>
+                    <table-organizations-component :person="row" :type="OrganizationTypeEnum.FOUNDER"/>
                 </td>
                 <td>
-                    <table-organiations-component :person="row" :type="OrganizationTypeEnum.INDIVIDUAL"/>
+                    <table-organizations-component :person="row" :type="OrganizationTypeEnum.INDIVIDUAL"/>
+                </td>
+                <td class="d-flex flex-row column-gap-1">
+                    <button type="button" class="btn btn-primary" @click="onClickEditButton(row)">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger" @click="onClickDeleteButton(row)"
+                            :disabled="row.isDeleting">
+                        <i v-if="!row.isDeleting" class="bi bi-trash"></i>
+                        <div v-else class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Удаление...</span>
+                        </div>
+                    </button>
                 </td>
             </tr>
             </tbody>
@@ -114,7 +158,7 @@ const closePhysicalPersonModal = () => {
         <div class="modal-dialog">
             <div class="modal-content">
                 <physical-person-form-component
-                    :id="undefined"
+                    :id="editId"
                     @saved="closePhysicalPersonModal"
                 />
             </div>
