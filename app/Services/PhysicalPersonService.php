@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Dto\PhysicalPerson\CreateDto;
 use App\Dto\PhysicalPerson\DeleteDto;
+use App\Dto\PhysicalPerson\MassDeleteDto;
 use App\Dto\PhysicalPerson\UpdateDto;
 use App\Models\Organization;
 use App\Models\PhysicalPerson;
@@ -42,6 +43,18 @@ class PhysicalPersonService
                 ->delete();
             PhysicalPerson::query()
                 ->where('id', $data->id)
+                ->delete();
+        });
+    }
+
+    public function massDelete(MassDeleteDto $data): void
+    {
+        DB::transaction(function () use($data) {
+            Organization::query()
+                ->whereIn('physical_person_id', $data->ids)
+                ->delete();
+            PhysicalPerson::query()
+                ->whereIn('id', $data->ids)
                 ->delete();
         });
     }

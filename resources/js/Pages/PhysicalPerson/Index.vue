@@ -14,7 +14,9 @@ interface PhysicalPersonWithActionsLoadedInterface extends PhysicalPersonInterfa
 
 const toggleModalButton = ref<HTMLButtonElement>()
 const isLoading = ref(false)
+const isMassDeleteLoading = ref(false)
 const editId = ref<number | undefined>()
+const checkedIds = ref<number[]>([])
 
 const data = ref<PaginatedInterface<PhysicalPersonWithActionsLoadedInterface>>({
     items: [],
@@ -33,6 +35,8 @@ onBeforeMount(() => {
 })
 
 const loadPage = (page = 1, perPage: number | undefined = 25) => {
+    checkedIds.value.splice(0, checkedIds.value.length)
+
     isLoading.value = true
 
     if (!perPage) {
@@ -89,17 +93,48 @@ const closePhysicalPersonModal = (physicalPerson: PhysicalPersonInterface) => {
     }
     editId.value = undefined
 }
+
+const onRowClick = (physicalPerson: PhysicalPersonInterface) => {
+    if (!checkedIds.value.includes(physicalPerson.id)) {
+        checkedIds.value.push(physicalPerson.id)
+    } else {
+        const findIndex = checkedIds.value.findIndex((id) => id === physicalPerson.id)
+        if (findIndex !== -1) {
+            checkedIds.value.splice(findIndex, 1)
+        }
+    }
+}
+
+const onMassDelete = () => {
+    isMassDeleteLoading.value = true
+    window.axios
+        .delete(ApiRoutes.physicalPersons.massDelete, {params: {ids: checkedIds.value}})
+        .then(() => {
+            loadPage(1)
+        })
+        .finally(() => {
+            isMassDeleteLoading.value = false
+        })
+}
 </script>
 
 <template>
     <Head title="Physical Persons"/>
 
-    <div class="d-flex flex-column p-2">
+    <div class="d-flex flex-column p-2 h-auto">
         <div class="d-flex flex-row justify-content-between">
             <button ref="toggleModalButton" type="button" class="btn btn-success" data-bs-toggle="modal"
                     data-bs-target="#physicalPersonModal">
                 Добавить
             </button>
+            <div v-if="checkedIds.length" class="d-flex flex-row column-gap-4 mt-2">
+                <button type="button" class="btn btn-danger" @click="onMassDelete">
+                    <span v-if="!isMassDeleteLoading">Удалить выбранные</span>
+                    <div v-else class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Удаление...</span>
+                    </div>
+                </button>
+            </div>
             <div v-if="isLoading" class="d-flex flex-row align-items-center column-gap-2">
                 <div>Загрузка...</div>
                 <div class="spinner-border text-primary" role="status">
@@ -107,9 +142,10 @@ const closePhysicalPersonModal = (physicalPerson: PhysicalPersonInterface) => {
                 </div>
             </div>
         </div>
-        <table class="table flex-grow mt-4">
+        <table class="table flex-grow mt-4 flex-grow-1 overflow-scroll">
             <thead>
             <tr>
+                <th scope="col"></th>
                 <th scope="col">Id</th>
                 <th scope="col">ИНН</th>
                 <th scope="col">Фамилия</th>
@@ -123,6 +159,16 @@ const closePhysicalPersonModal = (physicalPerson: PhysicalPersonInterface) => {
             </thead>
             <tbody>
             <tr v-for="row in data.items" :key="row.id">
+                <td>
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value=""
+                        :disabled="isLoading"
+                        @click="onRowClick(row)"
+                        :checked="checkedIds.includes(row.id)"
+                    />
+                </td>
                 <th scope="row">{{ row.id }}</th>
                 <td>{{ row.inn }}</td>
                 <td>{{ row.secondName }}</td>
@@ -138,15 +184,19 @@ const closePhysicalPersonModal = (physicalPerson: PhysicalPersonInterface) => {
                     <table-organizations-component :person="row" :type="OrganizationTypeEnum.INDIVIDUAL"/>
                 </td>
                 <td class="d-flex flex-row column-gap-1">
-                    <button type="button" class="btn btn-primary" @click="onClickEditButton(row)">
+                    <button type="button" class="btn btn-primary" @click="onClickEditButton(row)" :disabled="isLoading">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    <button type="button" class="btn btn-danger" @click="onClickDeleteButton(row)"
-                            :disabled="row.isDeleting">
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        @click="onClickDeleteButton(row)"
+                        :disabled="row.isDeleting || isLoading"
+                    >
                         <i v-if="!row.isDeleting" class="bi bi-trash"></i>
-                        <div v-else class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span v-else class="spinner-border spinner-border-sm text-primary" role="status">
                             <span class="visually-hidden">Удаление...</span>
-                        </div>
+                        </span>
                     </button>
                 </td>
             </tr>
