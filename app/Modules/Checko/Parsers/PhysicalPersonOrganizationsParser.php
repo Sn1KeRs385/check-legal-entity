@@ -25,48 +25,54 @@ class PhysicalPersonOrganizationsParser
 
         $personInfo = $this->apiClient->getPhysicalPerson($physicalPerson->inn);
 
-        foreach ($personInfo->data->individuals as $individual) {
-            /** @var Organization $organization */
-            $organization = $physicalPerson->organizations()
-                ->updateOrCreate([
-                    'type' => OrganizationType::INDIVIDUAL,
-                    'inn' => (int)$individual->inn,
-                ], [
-                    'name' => $individual->fio,
-                ]);
+        if($personInfo->data->individuals) {
+            foreach ($personInfo->data->individuals as $individual) {
+                /** @var Organization $organization */
+                $organization = $physicalPerson->organizations()
+                    ->updateOrCreate([
+                        'type' => OrganizationType::INDIVIDUAL,
+                        'inn' => (int)$individual->inn,
+                    ], [
+                        'name' => $individual->fio,
+                    ]);
 
-            if ($organization->wasRecentlyCreated) {
-                $returnData[] = $organization;
+                if ($organization->wasRecentlyCreated) {
+                    $returnData[] = $organization;
+                }
             }
         }
 
-        foreach ($personInfo->data->founders as $founder) {
-            /** @var Organization $organization */
-            $organization = $physicalPerson->organizations()
-                ->updateOrCreate([
-                    'type' => OrganizationType::FOUNDER,
-                    'inn' => (int)$founder->inn,
-                ], [
-                    'name' => $founder->fullName,
-                ]);
+        if($personInfo->data->founders) {
+            foreach ($personInfo->data->founders as $founder) {
+                /** @var Organization $organization */
+                $organization = $physicalPerson->organizations()
+                    ->updateOrCreate([
+                        'type' => OrganizationType::FOUNDER,
+                        'inn' => (int)$founder->inn,
+                    ], [
+                        'name' => $founder->fullName,
+                    ]);
 
-            if ($organization->wasRecentlyCreated) {
-                $returnData[] = $organization;
+                if ($organization->wasRecentlyCreated) {
+                    $returnData[] = $organization;
+                }
             }
         }
 
-        foreach ($personInfo->data->supervisors as $supervisor) {
-            /** @var Organization $organization */
-            $organization = $physicalPerson->organizations()
-                ->updateOrCreate([
-                    'type' => OrganizationType::SUPERVISOR,
-                    'inn' => (int)$supervisor->inn,
-                ], [
-                    'name' => $supervisor->fullName,
-                ]);
+        if($personInfo->data->supervisors) {
+            foreach ($personInfo->data->supervisors as $supervisor) {
+                /** @var Organization $organization */
+                $organization = $physicalPerson->organizations()
+                    ->updateOrCreate([
+                        'type' => OrganizationType::SUPERVISOR,
+                        'inn' => (int)$supervisor->inn,
+                    ], [
+                        'name' => $supervisor->fullName,
+                    ]);
 
-            if ($organization->wasRecentlyCreated) {
-                $returnData[] = $organization;
+                if ($organization->wasRecentlyCreated) {
+                    $returnData[] = $organization;
+                }
             }
         }
 

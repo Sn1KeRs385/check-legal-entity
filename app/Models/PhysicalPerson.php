@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int                           $inn
  * @property string                        $first_name
  * @property string                        $second_name
- * @property string                        $last_name
+ * @property string|null                   $last_name
  * @property Carbon|null                   $created_at
  * @property Carbon|null                   $updated_at
  *
