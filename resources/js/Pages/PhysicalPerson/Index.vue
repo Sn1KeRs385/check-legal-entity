@@ -9,14 +9,18 @@ import OrganizationTypeEnum from "@/enums/organization-type.enum";
 import TableOrganizationsComponent from "@/components/PhysicalPerson/TableOrganizationsComponent.vue";
 import PaginationComponent from "@/components/PhysicalPerson/PaginationComponent.vue";
 import PageCountComponent from "@/components/PhysicalPerson/PageCountComponent.vue";
+import OrganizationsParseResultComponent from "@/components/PhysicalPerson/OrganizationsParseResultComponent.vue";
 
 interface PhysicalPersonWithActionsLoadedInterface extends PhysicalPersonInterface {
     isDeleting: boolean
 }
 
 const toggleModalButton = ref<HTMLButtonElement>()
+const toggleResultButton = ref<HTMLButtonElement>()
 const isLoading = ref(false)
 const isMassDeleteLoading = ref(false)
+const isOrganizationsParseLoading = ref(false)
+const organizationsParseResult = ref<PhysicalPersonInterface[]>([])
 const editId = ref<number | undefined>()
 const checkedIds = ref<number[]>([])
 
@@ -36,7 +40,7 @@ onBeforeMount(() => {
     loadPage(1)
 })
 
-const loadPage = (page = 1, perPage: number | undefined) => {
+const loadPage = (page = 1, perPage: number | undefined = undefined) => {
     checkedIds.value.splice(0, checkedIds.value.length)
 
     isLoading.value = true
@@ -119,6 +123,20 @@ const onMassDelete = () => {
         })
 }
 
+const onOrganizationsParse = () => {
+    isOrganizationsParseLoading.value = true
+    window.axios
+        .post<PhysicalPersonInterface[]>(ApiRoutes.physicalPersons.organizationsParse, {ids: checkedIds.value})
+        .then((response) => {
+            organizationsParseResult.value.splice(0, organizationsParseResult.value.length, ...response.data)
+            toggleResultButton.value?.click()
+            loadPage(data.value.meta.page)
+        })
+        .finally(() => {
+            isOrganizationsParseLoading.value = false
+        })
+}
+
 const onPageChange = (page: number) => {
     loadPage(page)
 }
@@ -137,7 +155,17 @@ const onPerPageChange = (perPage: number) => {
                     data-bs-target="#physicalPersonModal">
                 Добавить
             </button>
+            <button v-show="false" ref="toggleResultButton" type="button" class="btn btn-success" data-bs-toggle="modal"
+                    data-bs-target="#organizationResultModal">
+                Отчет
+            </button>
             <div v-if="checkedIds.length" class="d-flex flex-row column-gap-4 mt-2">
+                <button type="button" class="btn btn-success" @click="onOrganizationsParse">
+                    <span v-if="!isOrganizationsParseLoading">Обновить организации</span>
+                    <div v-else class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Обновление...</span>
+                    </div>
+                </button>
                 <button type="button" class="btn btn-danger" @click="onMassDelete">
                     <span v-if="!isMassDeleteLoading">Удалить выбранные</span>
                     <div v-else class="spinner-border spinner-border-sm text-primary" role="status">
@@ -230,6 +258,14 @@ const onPerPageChange = (perPage: number) => {
                     :id="editId"
                     @saved="closePhysicalPersonModal"
                 />
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-xl fade" id="organizationResultModal" tabindex="-1">
+        <div class="modal-dialog model-xl">
+            <div class="modal-content">
+                <organizations-parse-result-component :physical-persons="organizationsParseResult"/>
             </div>
         </div>
     </div>

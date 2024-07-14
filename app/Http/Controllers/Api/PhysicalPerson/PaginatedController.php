@@ -13,7 +13,7 @@ class PaginatedController extends Controller
     public function __invoke(PaginationDto $paginationData): JsonResponse
     {
         $paginated = PhysicalPerson::query()
-            ->orderBy('id')
+            ->orderByDesc('id')
             ->with(['organizations'])
             ->paginate(perPage: $paginationData->perPage, page: $paginationData->page);
 
