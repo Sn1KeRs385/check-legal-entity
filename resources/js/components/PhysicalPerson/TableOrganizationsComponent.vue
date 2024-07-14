@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
-import ApiRoutes from "@/constants/api-routes";
-import {AxiosError} from "axios";
 import OrganizationTypeEnum from "@/enums/organization-type.enum";
 import PhysicalPersonInterface from "@/types/physical-person.interface";
 
@@ -19,7 +17,6 @@ const isOpened = ref(false)
 const fullList = computed(() => props.person.organizations.filter((organization) => organization.type === props.type));
 
 const toShow = computed(() => isOpened.value ? fullList.value : fullList.value.slice(0, SHOW_ORGANIZATION_COUNT))
-const toShowText = computed(() => toShow.value.map((organization) => ` (${organization.inn}) ${organization.name}`).join('; '))
 
 const canOpened = computed(() => !isOpened.value && fullList.value.length > toShow.value.length)
 </script>

@@ -7,6 +7,8 @@ import PhysicalPersonFormComponent from "@/components/PhysicalPerson/FormCompone
 import ApiRoutes from "@/constants/api-routes";
 import OrganizationTypeEnum from "@/enums/organization-type.enum";
 import TableOrganizationsComponent from "@/components/PhysicalPerson/TableOrganizationsComponent.vue";
+import PaginationComponent from "@/components/PhysicalPerson/PaginationComponent.vue";
+import PageCountComponent from "@/components/PhysicalPerson/PageCountComponent.vue";
 
 interface PhysicalPersonWithActionsLoadedInterface extends PhysicalPersonInterface {
     isDeleting: boolean
@@ -34,7 +36,7 @@ onBeforeMount(() => {
     loadPage(1)
 })
 
-const loadPage = (page = 1, perPage: number | undefined = 25) => {
+const loadPage = (page = 1, perPage: number | undefined) => {
     checkedIds.value.splice(0, checkedIds.value.length)
 
     isLoading.value = true
@@ -116,12 +118,20 @@ const onMassDelete = () => {
             isMassDeleteLoading.value = false
         })
 }
+
+const onPageChange = (page: number) => {
+    loadPage(page)
+}
+
+const onPerPageChange = (perPage: number) => {
+    loadPage(1, perPage)
+}
 </script>
 
 <template>
     <Head title="Physical Persons"/>
 
-    <div class="d-flex flex-column p-2 h-auto">
+    <div class="d-flex flex-column p-2 overflow-hidden" style="height: 100vh">
         <div class="d-flex flex-row justify-content-between">
             <button ref="toggleModalButton" type="button" class="btn btn-success" data-bs-toggle="modal"
                     data-bs-target="#physicalPersonModal">
@@ -142,66 +152,75 @@ const onMassDelete = () => {
                 </div>
             </div>
         </div>
-        <table class="table flex-grow mt-4 flex-grow-1 overflow-scroll">
-            <thead>
-            <tr>
-                <th scope="col"></th>
-                <th scope="col">Id</th>
-                <th scope="col">ИНН</th>
-                <th scope="col">Фамилия</th>
-                <th scope="col">Имя</th>
-                <th scope="col">Отчество</th>
-                <th scope="col">Руководитель</th>
-                <th scope="col">Учредитель</th>
-                <th scope="col">ИП</th>
-                <th scope="col">Действия</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="row in data.items" :key="row.id">
-                <td>
-                    <input
-                        class="form-check-input"
-                        type="checkbox"
-                        value=""
-                        :disabled="isLoading"
-                        @click="onRowClick(row)"
-                        :checked="checkedIds.includes(row.id)"
-                    />
-                </td>
-                <th scope="row">{{ row.id }}</th>
-                <td>{{ row.inn }}</td>
-                <td>{{ row.secondName }}</td>
-                <td>{{ row.firstName }}</td>
-                <td>{{ row.lastName || '-' }}</td>
-                <td>
-                    <table-organizations-component :person="row" :type="OrganizationTypeEnum.SUPERVISOR"/>
-                </td>
-                <td>
-                    <table-organizations-component :person="row" :type="OrganizationTypeEnum.FOUNDER"/>
-                </td>
-                <td>
-                    <table-organizations-component :person="row" :type="OrganizationTypeEnum.INDIVIDUAL"/>
-                </td>
-                <td class="d-flex flex-row column-gap-1">
-                    <button type="button" class="btn btn-primary" @click="onClickEditButton(row)" :disabled="isLoading">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-danger"
-                        @click="onClickDeleteButton(row)"
-                        :disabled="row.isDeleting || isLoading"
-                    >
-                        <i v-if="!row.isDeleting" class="bi bi-trash"></i>
-                        <span v-else class="spinner-border spinner-border-sm text-primary" role="status">
+        <div class="mt-4 flex-grow-1 overflow-scroll">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col" class="sticky-top"></th>
+                    <th scope="col" class="sticky-top">Id</th>
+                    <th scope="col" class="sticky-top">ИНН</th>
+                    <th scope="col" class="sticky-top">Фамилия</th>
+                    <th scope="col" class="sticky-top">Имя</th>
+                    <th scope="col" class="sticky-top">Отчество</th>
+                    <th scope="col" class="sticky-top">Руководитель</th>
+                    <th scope="col" class="sticky-top">Учредитель</th>
+                    <th scope="col" class="sticky-top">ИП</th>
+                    <th scope="col" class="sticky-top">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="row in data.items" :key="row.id" :class="{'table-active': checkedIds.includes(row.id)}">
+                    <td>
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            value=""
+                            :disabled="isLoading"
+                            @click="onRowClick(row)"
+                            :checked="checkedIds.includes(row.id)"
+                        />
+                    </td>
+                    <th scope="row">{{ row.id }}</th>
+                    <td>{{ row.inn }}</td>
+                    <td>{{ row.secondName }}</td>
+                    <td>{{ row.firstName }}</td>
+                    <td>{{ row.lastName || '-' }}</td>
+                    <td>
+                        <table-organizations-component :person="row" :type="OrganizationTypeEnum.SUPERVISOR"/>
+                    </td>
+                    <td>
+                        <table-organizations-component :person="row" :type="OrganizationTypeEnum.FOUNDER"/>
+                    </td>
+                    <td>
+                        <table-organizations-component :person="row" :type="OrganizationTypeEnum.INDIVIDUAL"/>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-row column-gap-1">
+                            <button type="button" class="btn btn-primary" @click="onClickEditButton(row)"
+                                    :disabled="isLoading">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-danger"
+                                @click="onClickDeleteButton(row)"
+                                :disabled="row.isDeleting || isLoading"
+                            >
+                                <i v-if="!row.isDeleting" class="bi bi-trash"></i>
+                                <span v-else class="spinner-border spinner-border-sm text-primary" role="status">
                             <span class="visually-hidden">Удаление...</span>
                         </span>
-                    </button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex flex-row justify-content-between">
+            <pagination-component :meta="data.meta" @on-page-click="onPageChange"/>
+            <page-count-component :meta="data.meta" @on-per-page-click="onPerPageChange" style="width: 120px"/>
+        </div>
     </div>
 
     <div class="modal fade" id="physicalPersonModal" tabindex="-1">
