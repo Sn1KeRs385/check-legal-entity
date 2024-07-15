@@ -9,6 +9,7 @@ use App\Dto\Responses\PhysicalPerson\PhysicalPersonDto;
 use App\Http\Controllers\Controller;
 use App\Models\PhysicalPerson;
 use App\Modules\Checko\Parsers\PhysicalPersonOrganizationsParser;
+use OpenApi\Attributes as OA;
 use Throwable;
 
 class OrganizationsParseController extends Controller
@@ -17,6 +18,22 @@ class OrganizationsParseController extends Controller
     {
     }
 
+    #[
+        OA\Post(
+            path: '/api/physical-persons/organizations-parse',
+            operationId: 'Organizations parse fpr physical persons',
+            description: 'Обновить список организаций для физ. лиц. В ответе будут только добавленные организации, а не все',
+            requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: OrganizationsParseDto::class)),
+            tags: ['Physical person'],
+            responses: [
+                new OA\Response(
+                    response: 200,
+                    description: 'Успешный ответ',
+                    content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: PhysicalPersonDto::class))
+                ),
+            ]
+        )
+    ]
     public function __invoke(OrganizationsParseDto $requestData): \Illuminate\Http\JsonResponse
     {
         $physicalPersons = PhysicalPerson::query()

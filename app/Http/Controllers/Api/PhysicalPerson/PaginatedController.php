@@ -9,9 +9,35 @@ use App\Dto\Responses\PhysicalPerson\PhysicalPersonPaginatedDto;
 use App\Http\Controllers\Controller;
 use App\Models\PhysicalPerson;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Attributes as OA;
 
 class PaginatedController extends Controller
 {
+    #[
+        OA\Get(
+            path: '/api/physical-persons',
+            operationId: 'Paginated physical persons',
+            description: 'Получить пагинированный список физ. лиц',
+            tags: ['Physical person'],
+            parameters: [
+                new OA\Parameter(
+                    name: 'paginationData',
+                    description: "page - номер страницы
+\r\nperPage - количество записей на странице",
+                    in: 'query',
+                    schema: new OA\Schema(ref: PaginationDto::class),
+                    explode: true,
+                ),
+            ],
+            responses: [
+                new OA\Response(
+                    response: 200,
+                    description: 'Успешный ответ',
+                    content: new OA\JsonContent(ref: PhysicalPersonPaginatedDto::class)
+                ),
+            ]
+        )
+    ]
     public function __invoke(PaginationDto $paginationData): JsonResponse
     {
         $paginated = PhysicalPerson::query()

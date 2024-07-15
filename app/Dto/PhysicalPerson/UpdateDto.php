@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\PhysicalPerson;
 
+use OpenApi\Attributes as OA;
 use Spatie\LaravelData\Attributes\FromRouteParameter;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\Validation\Exists;
@@ -14,15 +15,15 @@ use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 
-#[MapOutputName(SnakeCaseMapper::class)]
+#[OA\Schema, MapOutputName(SnakeCaseMapper::class)]
 class UpdateDto extends Data
 {
     #[Required, IntegerType, Exists('physical_persons', 'id'), FromRouteParameter('id')]
     public int $id;
-    #[Required, StringType]
+    #[OA\Property, Required, StringType]
     public string $firstName;
-    #[Required, StringType]
+    #[OA\Property, Required, StringType]
     public string $secondName;
-    #[Nullable, StringType]
+    #[OA\Property, Nullable, StringType]
     public ?string $lastName;
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Dto\PhysicalPerson;
 
+use OpenApi\Attributes as OA;
 use Spatie\LaravelData\Attributes\MapOutputName;
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\MaxDigits;
@@ -15,15 +16,15 @@ use Spatie\LaravelData\Attributes\Validation\Unique;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 
-#[MapOutputName(SnakeCaseMapper::class)]
+#[OA\Schema, MapOutputName(SnakeCaseMapper::class)]
 class CreateDto extends Data
 {
-    #[Required, IntegerType, Unique('physical_persons', 'inn'), MinDigits(12), MaxDigits(12)]
+    #[OA\Property, Required, IntegerType, Unique('physical_persons', 'inn'), MinDigits(12), MaxDigits(12)]
     public int $inn;
-    #[Required, StringType]
+    #[OA\Property, Required, StringType]
     public string $firstName;
-    #[Required, StringType]
+    #[OA\Property, Required, StringType]
     public string $secondName;
-    #[Nullable, StringType]
+    #[OA\Property, Nullable, StringType]
     public ?string $lastName;
 }
