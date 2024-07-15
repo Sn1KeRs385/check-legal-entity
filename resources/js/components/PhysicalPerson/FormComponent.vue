@@ -9,7 +9,7 @@ interface FormItemInterface {
     title: string,
     value: string,
     errors: string[],
-    disabled?: () => void,
+    disabled?: () => boolean,
 }
 
 interface Props {
