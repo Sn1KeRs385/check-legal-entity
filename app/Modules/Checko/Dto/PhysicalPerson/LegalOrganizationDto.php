@@ -10,25 +10,25 @@ use Spatie\LaravelData\Data;
 class LegalOrganizationDto extends Data
 {
     #[MapInputName('ОГРН')]
-    public string $ogrn;
+    public ?string $ogrn;
     #[MapInputName('ИНН')]
     public string $inn;
     #[MapInputName('КПП')]
-    public string $kpp;
+    public ?string $kpp;
     #[MapInputName('НаимСокр')]
-    public string $shortName;
+    public ?string $shortName;
     #[MapInputName('НаимПолн')]
     public string $fullName;
     #[MapInputName('ДатаРег')]
-    public string $registrationDate;
+    public ?string $registrationDate;
     #[MapInputName('Статус')]
-    public string $status;
+    public ?string $status;
     #[MapInputName('ДатаЛикв')]
     public ?string $stopDate;
     #[MapInputName('РегионКод')]
-    public string $regionCode;
+    public ?string $regionCode;
     #[MapInputName('ЮрАдрес')]
-    public string $address;
+    public ?string $address;
     #[MapInputName('ОКВЭД')]
-    public string $okved;
+    public ?string $okved;
 }

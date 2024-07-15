@@ -10,21 +10,21 @@ use Spatie\LaravelData\Data;
 class IndividualOrganizationDto extends Data
 {
     #[MapInputName('ОГРНИП')]
-    public string $ogrnip;
+    public ?string $ogrnip;
     #[MapInputName('ИНН')]
     public string $inn;
     #[MapInputName('ФИО')]
     public string $fio;
     #[MapInputName('Тип')]
-    public string $type;
+    public ?string $type;
     #[MapInputName('ДатаРег')]
-    public string $registrationDate;
+    public ?string $registrationDate;
     #[MapInputName('Статус')]
-    public string $status;
+    public ?string $status;
     #[MapInputName('ДатаПрекращ')]
     public ?string $stopDate;
     #[MapInputName('РегионКод')]
-    public string $regionCode;
+    public ?string $regionCode;
     #[MapInputName('ОКВЭД')]
-    public string $okved;
+    public ?string $okved;
 }
