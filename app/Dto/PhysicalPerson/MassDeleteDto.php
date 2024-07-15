@@ -9,9 +9,13 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class MassDeleteDto extends Data
 {
+    /** @var int[]  */
     #[Required, ArrayType]
     public array $ids;
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function rules(ValidationContext $context): array
     {
         return [

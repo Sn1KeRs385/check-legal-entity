@@ -36,7 +36,7 @@ class CheckoApiClient
     }
 
     /**
-     * @param array<string, mixed> $options
+     * @param array<string, array<string, mixed>> $options
      */
     private function callWithAuthorization(string $method, string $url, array $options = []): ResponseInterface
     {

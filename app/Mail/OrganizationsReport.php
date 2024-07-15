@@ -16,7 +16,7 @@ class OrganizationsReport extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param array<string, mixed> $reportRows
+     * @param array<int, array<string, mixed>> $reportRows
      */
     public function __construct(protected array $reportRows)
     {
