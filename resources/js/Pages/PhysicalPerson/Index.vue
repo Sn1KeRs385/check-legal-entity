@@ -13,6 +13,7 @@ import OrganizationsParseResultComponent from "@/components/PhysicalPerson/Organ
 
 interface PhysicalPersonWithActionsLoadedInterface extends PhysicalPersonInterface {
     isDeleting: boolean
+    isOrganizationParsing: boolean
 }
 
 const toggleModalButton = ref<HTMLButtonElement>()
@@ -61,7 +62,7 @@ const loadPage = (page = 1, perPage: number | undefined = undefined) => {
             data.value.items.splice(
                 0,
                 data.value.items.length,
-                ...(response.data.items).map((item) => ({...item, isDeleting: false}))
+                ...(response.data.items).map((item) => ({...item, isDeleting: false, isOrganizationParsing: false}))
             )
         })
         .finally(() => {
@@ -126,6 +127,10 @@ const onMassDelete = () => {
 
 const onOrganizationsParse = () => {
     isOrganizationsParseLoading.value = true
+    const physicalPersons = data.value.items.filter(({id}) => checkedIds.value.includes(id))
+    physicalPersons.forEach((person) => {
+        person.isOrganizationParsing = true
+    })
     window.axios
         .post<PhysicalPersonInterface[]>(ApiRoutes.physicalPersons.organizationsParse, {ids: checkedIds.value})
         .then((response) => {
@@ -135,6 +140,26 @@ const onOrganizationsParse = () => {
         })
         .finally(() => {
             isOrganizationsParseLoading.value = false
+            physicalPersons.forEach((person) => {
+                person.isOrganizationParsing = false
+            })
+        })
+}
+
+
+const onClickRefreshButton = (physicalPerson: PhysicalPersonWithActionsLoadedInterface) => {
+    isOrganizationsParseLoading.value = true
+    physicalPerson.isOrganizationParsing = true
+    window.axios
+        .post<PhysicalPersonInterface[]>(ApiRoutes.physicalPersons.organizationsParse, {ids: [physicalPerson.id]})
+        .then((response) => {
+            organizationsParseResult.value.splice(0, organizationsParseResult.value.length, ...response.data)
+            toggleResultButton.value?.click()
+            loadPage(data.value.meta.page)
+        })
+        .finally(() => {
+            isOrganizationsParseLoading.value = false
+            physicalPerson.isOrganizationParsing = false
         })
 }
 
@@ -228,6 +253,13 @@ const onPerPageChange = (perPage: number) => {
                             <button type="button" class="btn btn-primary" @click="onClickEditButton(row)"
                                     :disabled="isLoading">
                                 <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-success" @click="onClickRefreshButton(row)"
+                                    :disabled="isLoading || row.isOrganizationParsing">
+                                <i v-if="!row.isOrganizationParsing" class="bi bi-arrow-clockwise"></i>
+                                <span v-else class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Удаление...</span>
+                                </span>
                             </button>
                             <button
                                 type="button"

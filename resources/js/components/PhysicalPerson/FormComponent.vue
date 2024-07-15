@@ -312,7 +312,7 @@ const onAddOrganization = () => {
             <button type="button" class="btn btn-success mt-4" @click="onSaveClick" :disabled="isLoading">
                 <span v-if="!isLoading">Сохранить</span>
                 <span v-if="isLoading" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                <span v-if="isLoading" class="visually-hidden" role="status">Loading...</span>
+                <span v-if="isLoading" class="visually-hidden" role="status">Загрузка...</span>
             </button>
         </form>
     </div>
