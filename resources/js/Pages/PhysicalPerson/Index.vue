@@ -93,6 +93,7 @@ const closePhysicalPersonModal = (physicalPerson: PhysicalPersonInterface) => {
         const searchRow = data.value.items.find((item) => item.id === physicalPerson.id)
         if (searchRow) {
             Object.assign(searchRow, physicalPerson)
+            searchRow.organizations.splice(0, searchRow.organizations.length, ...physicalPerson.organizations)
         }
     } else {
         loadPage(1)
@@ -236,8 +237,8 @@ const onPerPageChange = (perPage: number) => {
                             >
                                 <i v-if="!row.isDeleting" class="bi bi-trash"></i>
                                 <span v-else class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Удаление...</span>
-                        </span>
+                                    <span class="visually-hidden">Удаление...</span>
+                                </span>
                             </button>
                         </div>
                     </td>
@@ -251,8 +252,8 @@ const onPerPageChange = (perPage: number) => {
         </div>
     </div>
 
-    <div class="modal fade" id="physicalPersonModal" tabindex="-1">
-        <div class="modal-dialog">
+    <div class="modal modal-xl fade" id="physicalPersonModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <physical-person-form-component
                     :id="editId"

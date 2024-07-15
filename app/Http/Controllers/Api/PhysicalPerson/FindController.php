@@ -39,6 +39,7 @@ class FindController extends Controller
     public function __invoke(int $id): JsonResponse
     {
         $person = PhysicalPerson::query()
+            ->with(['organizations'])
             ->findOrFail($id);
 
         return response()->json(PhysicalPersonDto::from($person));

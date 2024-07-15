@@ -46,6 +46,8 @@ class UpdateController extends Controller
     {
         $person = $this->service->update($requestData);
 
+        $person->load(['organizations']);
+
         return response()->json(PhysicalPersonDto::from($person));
     }
 }

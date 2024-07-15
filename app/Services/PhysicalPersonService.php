@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Dto\PhysicalPerson\CreateDto;
 use App\Dto\PhysicalPerson\DeleteDto;
 use App\Dto\PhysicalPerson\MassDeleteDto;
+use App\Dto\PhysicalPerson\OrganizationUpdateCreateDto;
 use App\Dto\PhysicalPerson\UpdateDto;
 use App\Models\Organization;
 use App\Models\PhysicalPerson;
@@ -22,6 +23,10 @@ class PhysicalPersonService
 
         $physicalPerson->save();
 
+        if (null !== $data->organizations) {
+            $physicalPerson->organizations()->createMany($data->organizations->toArray());
+        }
+
         return $physicalPerson;
     }
 
@@ -33,6 +38,33 @@ class PhysicalPersonService
         $physicalPerson->fill($data->toArray());
 
         $physicalPerson->save();
+
+        if (null !== $data->organizations) {
+            $existsIds = [];
+            foreach ($data->organizations as $organization) {
+                /** @var OrganizationUpdateCreateDto $organization */
+                $organizationModel = null;
+                if (is_int($organization->id)) {
+                    /** @var Organization $organizationModel */
+                    $organizationModel = $physicalPerson->organizations()
+                        ->findOrFail($organization->id);
+                } else {
+                    $organizationModel = new Organization();
+                    $organizationModel->physical_person_id = $physicalPerson->id;
+                }
+
+                $organizationModel->fill($organization->toArray());
+                $organizationModel->save();
+
+                $existsIds[] = $organization->id;
+            }
+
+            $physicalPerson->organizations()
+                ->whereNotIn('id', $existsIds)
+                ->delete();
+        }
+
+        $physicalPerson->refresh();
 
         return $physicalPerson;
     }

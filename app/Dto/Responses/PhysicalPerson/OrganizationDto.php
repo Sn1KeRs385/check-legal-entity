@@ -14,6 +14,8 @@ use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 class OrganizationDto extends Data
 {
     #[OA\Property]
+    public int $id;
+    #[OA\Property]
     public OrganizationType $type;
     #[OA\Property]
     public int $inn;
