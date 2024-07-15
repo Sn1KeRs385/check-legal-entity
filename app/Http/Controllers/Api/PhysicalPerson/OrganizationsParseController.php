@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\PhysicalPerson;
 
 use App\Dto\PhysicalPerson\OrganizationsParseDto;
@@ -7,7 +9,6 @@ use App\Dto\Responses\PhysicalPerson\PhysicalPersonDto;
 use App\Http\Controllers\Controller;
 use App\Models\PhysicalPerson;
 use App\Modules\Checko\Parsers\PhysicalPersonOrganizationsParser;
-use Illuminate\Http\Response;
 use Throwable;
 
 class OrganizationsParseController extends Controller
@@ -25,17 +26,16 @@ class OrganizationsParseController extends Controller
 
         $results = [];
 
-        foreach($physicalPersons as $physicalPerson) {
+        foreach ($physicalPersons as $physicalPerson) {
             try {
                 $newOrganizations = $this->parser->__invoke($physicalPerson);
                 if (count($newOrganizations) > 0) {
                     $results[] = PhysicalPersonDto::from([
-                        ...($physicalPerson->attributesToArray()),
+                        ...$physicalPerson->attributesToArray(),
                         'organizations' => $newOrganizations->toArray(),
                     ]);
                 }
             } catch (Throwable $exception) {
-
             }
         }
 

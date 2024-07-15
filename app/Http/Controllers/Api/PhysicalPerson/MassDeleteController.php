@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\PhysicalPerson;
 
-use App\Dto\PhysicalPerson\DeleteDto;
 use App\Dto\PhysicalPerson\MassDeleteDto;
 use App\Http\Controllers\Controller;
 use App\Services\PhysicalPersonService;

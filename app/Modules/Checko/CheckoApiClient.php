@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Checko;
 
 use App\Modules\Checko\Dto\PhysicalPerson\GetPhysicalPersonDataDto;
-use App\Modules\Checko\Dto\PhysicalPerson\PhysicalPersonDto;
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 
 class CheckoApiClient
@@ -28,7 +27,7 @@ class CheckoApiClient
     {
         $response = $this->callWithAuthorization('get', 'v2/person', [
             'query' => [
-                'inn' => $inn
+                'inn' => $inn,
             ],
         ]);
 
@@ -45,7 +44,7 @@ class CheckoApiClient
 
         $options['query'] = [
             'key' => $apiKey,
-            ...($options['query'] ?? [])
+            ...($options['query'] ?? []),
         ];
 
         return $this->apiClient->request($method, $url, $options);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Modules\Checko\Parsers;
 
 use App\Enums\OrganizationType;
@@ -15,7 +17,7 @@ class PhysicalPersonOrganizationsParser
     }
 
     /**
-     * Возвращает только новые организации. В уже существующих обновляет только названия
+     * Возвращает только новые организации. В уже существующих обновляет только названия.
      *
      * @return Collection<int, Organization>
      */
@@ -25,13 +27,13 @@ class PhysicalPersonOrganizationsParser
 
         $personInfo = $this->apiClient->getPhysicalPerson($physicalPerson->inn);
 
-        if($personInfo->data->individuals) {
+        if ($personInfo->data->individuals) {
             foreach ($personInfo->data->individuals as $individual) {
                 /** @var Organization $organization */
                 $organization = $physicalPerson->organizations()
                     ->updateOrCreate([
                         'type' => OrganizationType::INDIVIDUAL,
-                        'inn' => (int)$individual->inn,
+                        'inn' => (int) $individual->inn,
                     ], [
                         'name' => $individual->fio,
                     ]);
@@ -42,13 +44,13 @@ class PhysicalPersonOrganizationsParser
             }
         }
 
-        if($personInfo->data->founders) {
+        if ($personInfo->data->founders) {
             foreach ($personInfo->data->founders as $founder) {
                 /** @var Organization $organization */
                 $organization = $physicalPerson->organizations()
                     ->updateOrCreate([
                         'type' => OrganizationType::FOUNDER,
-                        'inn' => (int)$founder->inn,
+                        'inn' => (int) $founder->inn,
                     ], [
                         'name' => $founder->fullName,
                     ]);
@@ -59,13 +61,13 @@ class PhysicalPersonOrganizationsParser
             }
         }
 
-        if($personInfo->data->supervisors) {
+        if ($personInfo->data->supervisors) {
             foreach ($personInfo->data->supervisors as $supervisor) {
                 /** @var Organization $organization */
                 $organization = $physicalPerson->organizations()
                     ->updateOrCreate([
                         'type' => OrganizationType::SUPERVISOR,
-                        'inn' => (int)$supervisor->inn,
+                        'inn' => (int) $supervisor->inn,
                     ], [
                         'name' => $supervisor->fullName,
                     ]);

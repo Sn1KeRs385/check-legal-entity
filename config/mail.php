@@ -1,7 +1,8 @@
 <?php
 
-return [
+declare(strict_types=1);
 
+return [
     /*
     |--------------------------------------------------------------------------
     | Default Mailer
@@ -36,7 +37,6 @@ return [
     */
 
     'mailers' => [
-
         'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),
@@ -94,7 +94,6 @@ return [
                 'postmark',
             ],
         ],
-
     ],
 
     /*
@@ -113,6 +112,5 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
-    'organizations_report_recipient' => env('ORGANIZATIONS_REPORT_RECIPIENT')
-
+    'organizations_report_recipient' => env('ORGANIZATIONS_REPORT_RECIPIENT'),
 ];

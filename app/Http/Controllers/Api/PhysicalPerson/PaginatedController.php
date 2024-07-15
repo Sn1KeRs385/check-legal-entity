@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\PhysicalPerson;
 
 use App\Dto\Requests\PaginationDto;
@@ -25,7 +27,7 @@ class PaginatedController extends Controller
                 'itemCount' => $paginated->total(),
                 'pageCount' => $paginated->lastPage(),
                 'hasPreviousPage' => $paginated->currentPage() > 1,
-                'hasNextPage' => $paginated->hasMorePages()
+                'hasNextPage' => $paginated->hasMorePages(),
             ],
         ]));
     }

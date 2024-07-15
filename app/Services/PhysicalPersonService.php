@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Dto\PhysicalPerson\CreateDto;
@@ -37,7 +39,7 @@ class PhysicalPersonService
 
     public function delete(DeleteDto $data): void
     {
-        DB::transaction(function () use($data) {
+        DB::transaction(function () use ($data): void {
             Organization::query()
                 ->where('physical_person_id', $data->id)
                 ->delete();
@@ -49,7 +51,7 @@ class PhysicalPersonService
 
     public function massDelete(MassDeleteDto $data): void
     {
-        DB::transaction(function () use($data) {
+        DB::transaction(function () use ($data): void {
             Organization::query()
                 ->whereIn('physical_person_id', $data->ids)
                 ->delete();

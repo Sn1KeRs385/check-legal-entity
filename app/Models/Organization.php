@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\OrganizationType;
@@ -15,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string           $name
  * @property Carbon|null      $created_at
  * @property Carbon|null      $updated_at
- *
  * @property PhysicalPerson   $physicalPerson
  */
 class Organization extends Model
@@ -33,7 +34,7 @@ class Organization extends Model
      * @var array<string, class-string>
      */
     protected $casts = [
-        'type' => OrganizationType::class
+        'type' => OrganizationType::class,
     ];
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
 use App\Enums\OrganizationType;
@@ -17,14 +19,16 @@ use Throwable;
 
 class UpdatePhysicalPersonOrganizationsJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /**
      * Create a new job instance.
      */
     public function __construct()
     {
-        //
     }
 
     /**
@@ -38,7 +42,7 @@ class UpdatePhysicalPersonOrganizationsJob implements ShouldQueue
         $result = [];
 
         PhysicalPerson::query()
-            ->chunk(100, function ($persons) use (&$result, $parser) {
+            ->chunk(100, function ($persons) use (&$result, $parser): void {
                 foreach ($persons as $person) {
                     try {
                         /** @var PhysicalPerson $person */
@@ -47,29 +51,28 @@ class UpdatePhysicalPersonOrganizationsJob implements ShouldQueue
                             $result[] = [
                                 'name' => implode(' ', [$person->second_name, $person->first_name, $person->last_name ?? '']),
                                 'inn' => $person->inn,
-                                'supervisor' => $parseResult->filter(fn(Organization $organization) => $organization->type === OrganizationType::SUPERVISOR)
+                                'supervisor' => $parseResult->filter(fn (Organization $organization) => OrganizationType::SUPERVISOR === $organization->type)
                                     ->values()
-                                    ->map(fn(Organization $organization) => $organization->name)
+                                    ->map(fn (Organization $organization) => $organization->name)
                                     ->all(),
-                                'founder' => $parseResult->filter(fn(Organization $organization) => $organization->type === OrganizationType::FOUNDER)
+                                'founder' => $parseResult->filter(fn (Organization $organization) => OrganizationType::FOUNDER === $organization->type)
                                     ->values()
-                                    ->map(fn(Organization $organization) => $organization->name)
+                                    ->map(fn (Organization $organization) => $organization->name)
                                     ->all(),
-                                'individual' => $parseResult->filter(fn(Organization $organization) => $organization->type === OrganizationType::INDIVIDUAL)
+                                'individual' => $parseResult->filter(fn (Organization $organization) => OrganizationType::INDIVIDUAL === $organization->type)
                                     ->values()
-                                    ->map(fn(Organization $organization) => $organization->name)
+                                    ->map(fn (Organization $organization) => $organization->name)
                                     ->all(),
                             ];
                         }
                     } catch (Throwable $exception) {
-
                     }
                 }
             });
 
         /** @var string|null $reportRecipient */
         $reportRecipient = config('mail.organizations_report_recipient');
-        if($reportRecipient && count($result) > 0) {
+        if ($reportRecipient && count($result) > 0) {
             Mail::to($reportRecipient)->send(new OrganizationsReport($result));
         }
     }

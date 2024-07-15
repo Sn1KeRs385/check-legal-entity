@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto\Responses\PhysicalPerson;
 
 use Spatie\LaravelData\Attributes\DataCollectionOf;
@@ -17,7 +19,7 @@ class PhysicalPersonDto extends Data
     public string $secondName;
     public ?string $lastName;
 
-    /** @var DataCollection<int, OrganizationDto>  */
+    /** @var DataCollection<int, OrganizationDto> */
     #[DataCollectionOf(OrganizationDto::class)]
     public DataCollection $organizations;
 }

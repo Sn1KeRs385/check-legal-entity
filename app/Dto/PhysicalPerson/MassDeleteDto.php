@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto\PhysicalPerson;
 
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
@@ -9,7 +11,7 @@ use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 class MassDeleteDto extends Data
 {
-    /** @var int[]  */
+    /** @var int[] */
     #[Required, ArrayType]
     public array $ids;
 

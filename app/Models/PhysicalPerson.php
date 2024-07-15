@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -15,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null                   $last_name
  * @property Carbon|null                   $created_at
  * @property Carbon|null                   $updated_at
- *
  * @property Collection<int, Organization> $organizations
  */
 class PhysicalPerson extends Model

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Dto\Responses\PhysicalPerson;
 
 use App\Enums\OrganizationType;
