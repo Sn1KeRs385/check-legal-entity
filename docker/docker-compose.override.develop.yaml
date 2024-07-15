@@ -28,3 +28,7 @@ services:
   php:
     volumes:
       - ./config/php/develop/ini:/usr/local/etc/php/custom.d:cached
+
+  cron:
+    volumes:
+      - ./config/php/develop/ini:/usr/local/etc/php/custom.d:cached

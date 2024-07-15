@@ -10,6 +10,9 @@ services:
         volumes:
             - ./../:/var/www/html:cached
         restart: always
+        depends_on:
+          - mysql
+          - redis
 
     mysql:
         container_name: "${COMPOSE_PROJECT_NAME}-mysql"
@@ -25,5 +28,40 @@ services:
             - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         restart: always
 
+    redis:
+      container_name: "${COMPOSE_PROJECT_NAME}-redis"
+      image: redis:7.2.5-alpine
+      restart: always
+      volumes:
+        - redis-data:/data
+
+    supervisord:
+        container_name: "${COMPOSE_PROJECT_NAME}-supervisord"
+        build:
+          context: ./config/php
+          target: supervisor
+        volumes:
+          - ./../:/var/www/html:cached
+          - ./config/supervisord/conf.d:/etc/supervisord.d:cached
+          - ./config/supervisord/supervisord.conf:/etc/supervisord.conf:cached
+        depends_on:
+          - php
+
+    cron:
+        container_name: "${COMPOSE_PROJECT_NAME}-cron"
+        build:
+          context: ./config/php
+          target: cron
+        working_dir: /var/www/html
+        command: 'supercronic /etc/crontab'
+        volumes:
+            - ./../:/var/www/html:cached
+            - ./config/cron/crontab:/etc/crontab:cached
+        depends_on:
+            - mysql
+            - redis
+        restart: always
+
 volumes:
     mysql-data:
+    redis-data:
