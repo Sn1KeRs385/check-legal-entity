@@ -17,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
 
-class UpdatePhysicalPersonOrganizationsJob implements ShouldQueue
+class CheckNewLegalEntitiesJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;

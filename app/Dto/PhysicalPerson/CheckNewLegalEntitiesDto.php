@@ -11,7 +11,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
 #[OA\Schema]
-class OrganizationsParseDto extends Data
+class CheckNewLegalEntitiesDto extends Data
 {
     /** @var int[] */
     #[OA\Property(items: new OA\Items(type: 'integer')), Required, ArrayType]

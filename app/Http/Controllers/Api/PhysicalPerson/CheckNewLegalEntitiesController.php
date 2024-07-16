@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\PhysicalPerson;
 
-use App\Dto\PhysicalPerson\OrganizationsParseDto;
+use App\Dto\PhysicalPerson\CheckNewLegalEntitiesDto;
 use App\Dto\Responses\PhysicalPerson\PhysicalPersonDto;
 use App\Http\Controllers\Controller;
 use App\Models\PhysicalPerson;
@@ -12,7 +12,7 @@ use App\Modules\Checko\Parsers\PhysicalPersonOrganizationsParser;
 use OpenApi\Attributes as OA;
 use Throwable;
 
-class OrganizationsParseController extends Controller
+class CheckNewLegalEntitiesController extends Controller
 {
     public function __construct(private readonly PhysicalPersonOrganizationsParser $parser)
     {
@@ -20,10 +20,10 @@ class OrganizationsParseController extends Controller
 
     #[
         OA\Post(
-            path: '/api/physical-persons/organizations-parse',
-            operationId: 'Organizations parse fpr physical persons',
-            description: 'Обновить список организаций для физ. лиц. В ответе будут только добавленные организации, а не все',
-            requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: OrganizationsParseDto::class)),
+            path: '/api/physical-persons/check-new-legal-entities',
+            operationId: 'Check new legal entities for  physical persons',
+            description: 'Проверить новые юр. лица. В ответе будут только новые организации, а не все',
+            requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: CheckNewLegalEntitiesDto::class)),
             tags: ['Physical person'],
             responses: [
                 new OA\Response(
@@ -34,7 +34,7 @@ class OrganizationsParseController extends Controller
             ]
         )
     ]
-    public function __invoke(OrganizationsParseDto $requestData): \Illuminate\Http\JsonResponse
+    public function __invoke(CheckNewLegalEntitiesDto $requestData): \Illuminate\Http\JsonResponse
     {
         $physicalPersons = PhysicalPerson::query()
             ->with(['organizations'])

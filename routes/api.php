@@ -10,7 +10,8 @@ Route::prefix('physical-persons')
         Route::get('/', App\Http\Controllers\Api\PhysicalPerson\PaginatedController::class);
         Route::post('/', App\Http\Controllers\Api\PhysicalPerson\CreateController::class);
         Route::delete('/mass-delete', App\Http\Controllers\Api\PhysicalPerson\MassDeleteController::class);
-        Route::post('/organizations-parse', App\Http\Controllers\Api\PhysicalPerson\OrganizationsParseController::class);
+        Route::post('/check-new-legal-entities', App\Http\Controllers\Api\PhysicalPerson\CheckNewLegalEntitiesController::class);
+        Route::post('/start-check-new-legal-entities-job', App\Http\Controllers\Api\PhysicalPerson\StartCheckNewLegalEntitiesJobController::class);
 
         Route::prefix('{id}')
             ->name('byId')

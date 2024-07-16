@@ -132,7 +132,7 @@ const onOrganizationsParse = () => {
         person.isOrganizationParsing = true
     })
     window.axios
-        .post<PhysicalPersonInterface[]>(ApiRoutes.physicalPersons.organizationsParse, {ids: checkedIds.value})
+        .post<PhysicalPersonInterface[]>(ApiRoutes.physicalPersons.checkNewLegalEntities, {ids: checkedIds.value})
         .then((response) => {
             organizationsParseResult.value.splice(0, organizationsParseResult.value.length, ...response.data)
             toggleResultButton.value?.click()
@@ -151,7 +151,7 @@ const onClickRefreshButton = (physicalPerson: PhysicalPersonWithActionsLoadedInt
     isOrganizationsParseLoading.value = true
     physicalPerson.isOrganizationParsing = true
     window.axios
-        .post<PhysicalPersonInterface[]>(ApiRoutes.physicalPersons.organizationsParse, {ids: [physicalPerson.id]})
+        .post<PhysicalPersonInterface[]>(ApiRoutes.physicalPersons.checkNewLegalEntities, {ids: [physicalPerson.id]})
         .then((response) => {
             organizationsParseResult.value.splice(0, organizationsParseResult.value.length, ...response.data)
             toggleResultButton.value?.click()
@@ -170,6 +170,11 @@ const onPageChange = (page: number) => {
 const onPerPageChange = (perPage: number) => {
     loadPage(1, perPage)
 }
+
+const onStartCheckNewLegalEntitiesJob = () => {
+    window.axios
+        .post(ApiRoutes.physicalPersons.startCheckNewLegalEntitiesJob)
+}
 </script>
 
 <template>
@@ -177,19 +182,25 @@ const onPerPageChange = (perPage: number) => {
 
     <div class="d-flex flex-column p-2 overflow-hidden" style="height: 100vh">
         <div class="d-flex flex-row justify-content-between">
-            <button ref="toggleModalButton" type="button" class="btn btn-success" data-bs-toggle="modal"
-                    data-bs-target="#physicalPersonModal">
-                Добавить
-            </button>
+            <div class="d-flex flex-row column-gap-2">
+                <button ref="toggleModalButton" type="button" class="btn btn-success" data-bs-toggle="modal"
+                        data-bs-target="#physicalPersonModal">
+                    Добавить
+                </button>
+                <button ref="toggleModalButton" type="button" class="btn btn-warning"
+                        @click="onStartCheckNewLegalEntitiesJob">
+                    Запустить массовую проверку
+                </button>
+            </div>
             <button v-show="false" ref="toggleResultButton" type="button" class="btn btn-success" data-bs-toggle="modal"
                     data-bs-target="#organizationResultModal">
                 Отчет
             </button>
             <div v-if="checkedIds.length" class="d-flex flex-row column-gap-4 mt-2">
                 <button type="button" class="btn btn-success" @click="onOrganizationsParse">
-                    <span v-if="!isOrganizationsParseLoading">Обновить организации</span>
+                    <span v-if="!isOrganizationsParseLoading">Проверить юр. лица</span>
                     <div v-else class="spinner-border spinner-border-sm text-primary" role="status">
-                        <span class="visually-hidden">Обновление...</span>
+                        <span class="visually-hidden">Проверка...</span>
                     </div>
                 </button>
                 <button type="button" class="btn btn-danger" @click="onMassDelete">

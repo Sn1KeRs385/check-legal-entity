@@ -29,16 +29,15 @@ class PhysicalPersonOrganizationsParser
 
         if ($personInfo->data->individuals) {
             foreach ($personInfo->data->individuals as $individual) {
-                /** @var Organization $organization */
-                $organization = $physicalPerson->organizations()
-                    ->updateOrCreate([
-                        'type' => OrganizationType::INDIVIDUAL,
-                        'inn' => (int) $individual->inn,
-                    ], [
-                        'name' => $individual->fio,
-                    ]);
+                $organization = $this->checkInnNotExists(
+                    $physicalPerson,
+                    OrganizationType::INDIVIDUAL,
+                    (int) $individual->inn,
+                    $individual->fio
+                );
 
-                if ($organization->wasRecentlyCreated) {
+                if ($organization) {
+                    $organization->id = 0;
                     $returnData[] = $organization;
                 }
             }
@@ -46,16 +45,15 @@ class PhysicalPersonOrganizationsParser
 
         if ($personInfo->data->founders) {
             foreach ($personInfo->data->founders as $founder) {
-                /** @var Organization $organization */
-                $organization = $physicalPerson->organizations()
-                    ->updateOrCreate([
-                        'type' => OrganizationType::FOUNDER,
-                        'inn' => (int) $founder->inn,
-                    ], [
-                        'name' => $founder->fullName,
-                    ]);
+                $organization = $this->checkInnNotExists(
+                    $physicalPerson,
+                    OrganizationType::FOUNDER,
+                    (int) $founder->inn,
+                    $founder->fullName
+                );
 
-                if ($organization->wasRecentlyCreated) {
+                if ($organization) {
+                    $organization->id = 0;
                     $returnData[] = $organization;
                 }
             }
@@ -63,21 +61,46 @@ class PhysicalPersonOrganizationsParser
 
         if ($personInfo->data->supervisors) {
             foreach ($personInfo->data->supervisors as $supervisor) {
-                /** @var Organization $organization */
-                $organization = $physicalPerson->organizations()
-                    ->updateOrCreate([
-                        'type' => OrganizationType::SUPERVISOR,
-                        'inn' => (int) $supervisor->inn,
-                    ], [
-                        'name' => $supervisor->fullName,
-                    ]);
+                $organization = $this->checkInnNotExists(
+                    $physicalPerson,
+                    OrganizationType::SUPERVISOR,
+                    (int) $supervisor->inn,
+                    $supervisor->fullName
+                );
 
-                if ($organization->wasRecentlyCreated) {
+                if ($organization) {
+                    $organization->id = 0;
                     $returnData[] = $organization;
                 }
             }
         }
 
         return collect($returnData);
+    }
+
+    /**
+     * Возращает модель организации если ее нет в бд (не сохраняет в бд). Если есть, то вернет null.
+     */
+    private function checkInnNotExists(
+        PhysicalPerson $physicalPerson,
+        OrganizationType $organizationType,
+        int $inn,
+        string $name,
+    ): ?Organization {
+        $organizationFind = $physicalPerson->organizations()
+            ->where('type', $organizationType)
+            ->where('inn', $inn)
+            ->first();
+
+        if (!$organizationFind) {
+            $organization = new Organization();
+            $organization->type = $organizationType;
+            $organization->inn = $inn;
+            $organization->name = $name;
+
+            return $organization;
+        }
+
+        return null;
     }
 }
