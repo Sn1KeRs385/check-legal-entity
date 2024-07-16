@@ -187,7 +187,7 @@ const onStartCheckNewLegalEntitiesJob = () => {
                         data-bs-target="#physicalPersonModal">
                     Добавить
                 </button>
-                <button ref="toggleModalButton" type="button" class="btn btn-warning"
+                <button type="button" class="btn btn-warning"
                         @click="onStartCheckNewLegalEntitiesJob">
                     Запустить массовую проверку
                 </button>
